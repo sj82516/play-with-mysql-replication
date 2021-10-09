@@ -1,0 +1,23 @@
+{
+  "name": "mysql-replication",
+  "version": "1.0.0",
+  "description": "了解 MySQL Replication 使用，並檢視在 RDS 上的功能，採用 MySQL v5.7，測試環境使用 docker",
+  "main": "common.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sj82516/play-with-mysql-replication.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sj82516/play-with-mysql-replication/issues"
+  },
+  "homepage": "https://github.com/sj82516/play-with-mysql-replication#readme",
+  "dependencies": {
+    "mysql2": "^2.3.0"
+  }
+}

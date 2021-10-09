@@ -1,8 +1,14 @@
 const mysql = require('mysql2/promise');
+const {
+    connectSourceDB,
+    connectReplicaDB,
+    setUpReplication,
+    closeConnection
+} = require('../../common');
 
 async function main() {
-    const sourceDBConnection = await connectSourceDB();
-    const replicaDBConnection = await connectReplicaDB();
+    const sourceDBConnection = await connectSourceDB('localhost');
+    const replicaDBConnection = await connectReplicaDB('localhost');
     await setUpReplication(sourceDBConnection, replicaDBConnection);
     await createDBAndInsertData(sourceDBConnection);
     // 需要等一小段時間同步
@@ -12,39 +18,6 @@ async function main() {
 }
 
 main();
-
-async function connectSourceDB() {
-    return await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: 'root',
-        port: 3307
-    })
-}
-
-async function connectReplicaDB() {
-    return await mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: 'root',
-        port: 3308
-    })
-}
-
-async function setUpReplication(sourceDBConnection, replicaDBConnection) {
-    createReplcaUser(sourceDBConnection);
-    startReplica(replicaDBConnection);
-}
-
-async function createReplcaUser(sourceDBConnection){
-    await sourceDBConnection.execute("CREATE USER IF NOT EXISTS 'repl' identified by 'repl'");
-    await sourceDBConnection.execute("GRANT REPLICATION slave on *.* to 'repl'");
-}
-
-async function startReplica(replicaDBConnection) {
-    await replicaDBConnection.execute("CHANGE MASTER TO MASTER_HOST='source', MASTER_USER='repl', MASTER_PASSWORD='repl'");
-    await replicaDBConnection.execute("START SLAVE");
-}
 
 async function createDBAndInsertData(sourceDBConnection) {
     await sourceDBConnection.execute("CREATE SCHEMA IF NOT EXISTS test");
@@ -65,9 +38,4 @@ async function checkDataInReplica(replicaDBConnection) {
     }catch(error) {
         console.log(error.sqlMessage);
     }
-}
-
-async function closeConnection(sourceDBConnection, replicaDBConnection) {
-    await sourceDBConnection.destroy();
-    await replicaDBConnection.destroy();
 }
