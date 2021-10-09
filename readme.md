@@ -7,7 +7,7 @@
    2. 對應的測試 script 用 node.js 撰寫，執行 `$node test/index.js`
    3. 如果要重跑實驗最好清掉 container `$docker container prune`
 
-測驗的方式只要是
+測驗的方式
 1. 寫入 source，預期 hello1/hello2 要被同步
 2. 調整 replica
 3. 寫入 source
@@ -88,5 +88,5 @@ mysql> START SLAVE FOR CHANNEL "source_2";
 2021-10-09T23:15:12.092305Z 36 [ERROR] Error running query, slave SQL thread aborted. Fix the problem, and restart the slave SQL thread with "SLAVE START". We stopped at log 'mysql-bin-changelog.000155' position 3419.
 
 ## 結語
-實驗結果跟一開始猜想差不多，replication 就是單純把 binlog 同步到 replica 上執行一遍，所以只要指令能成功跑起來，replica 要做什麼其他的操作都是沒問題，這會在涉及到 row-based / statement-based binlog 的差異  
+實驗結果跟一開始猜想差不多，replication 就是單純把 binlog 同步到 replica 上執行一遍，所以只要操作能成功跑起來，replica 要做什麼其他的操作都是沒問題，這會在涉及到 row-based / statement-based binlog 的差異  
 rds 部分基本與 mysql 相同
