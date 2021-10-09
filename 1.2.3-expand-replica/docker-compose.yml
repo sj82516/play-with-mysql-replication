@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  source:
+    image: "mysql:5.7"
+    volumes: 
+      - ./source:/etc/mysql/conf.d
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+  replica:
+    image: "mysql:5.7"
+    volumes: 
+      - ./replica:/etc/mysql/conf.d
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
