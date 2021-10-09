@@ -1,0 +1,6 @@
+[mysqld]
+server-id=2
+gtid_mode=ON
+enforce-gtid-consistency=ON
+master_info_repository  =table
+relay_log_info_repository =table

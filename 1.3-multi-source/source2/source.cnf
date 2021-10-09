@@ -1,0 +1,5 @@
+[mysqld]
+log-bin=mysql-bin
+server-id=3
+gtid-mode=ON
+enforce-gtid-consistency=ON

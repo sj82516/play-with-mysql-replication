@@ -1,0 +1,7 @@
+[mysqld]
+log-bin=mysql-bin
+server-id=1
+gtid-mode=ON
+enforce-gtid-consistency=ON
+master_info_repository  =table
+relay_log_info_repository =table
