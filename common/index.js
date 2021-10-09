@@ -1,11 +1,11 @@
 const mysql = require('mysql2/promise');
 
-exports.connectSourceDB = async function connectSourceDB(url) {
+exports.connectSourceDB = async function connectSourceDB(url, port = 3307) {
     return await mysql.createConnection({
         host: url,
         user: 'root',
         password: 'rootroot',
-        port: 3307
+        port: port
     })
 }
 
@@ -23,9 +23,9 @@ exports.closeConnection = async function closeConnection(sourceDBConnection, rep
     await replicaDBConnection.destroy();
 }
 
-exports.setUpReplication = async function setUpReplication(sourceDBConnection, replicaDBConnection) {
+exports.setUpReplication = async function setUpReplication(sourceDBConnection, replicaDBConnection, source = "source") {
     createReplcaUser(sourceDBConnection);
-    startReplica(replicaDBConnection);
+    startReplica(replicaDBConnection, source);
 }
 
 async function createReplcaUser(sourceDBConnection){
@@ -33,7 +33,7 @@ async function createReplcaUser(sourceDBConnection){
     await sourceDBConnection.execute("GRANT REPLICATION slave on *.* to 'repl'");
 }
 
-async function startReplica(replicaDBConnection) {
-    await replicaDBConnection.execute("CHANGE MASTER TO MASTER_HOST='source', MASTER_USER='repl', MASTER_PASSWORD='repl'");
-    await replicaDBConnection.execute("START SLAVE");
+async function startReplica(replicaDBConnection, source) {
+    await replicaDBConnection.execute(`CHANGE MASTER TO MASTER_HOST='${source}', MASTER_USER='repl', MASTER_PASSWORD='repl' FOR CHANNEL "${source}"`);
+    await replicaDBConnection.execute(`START SLAVE FOR CHANNEL "${source}"`);
 }
