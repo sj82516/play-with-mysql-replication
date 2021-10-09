@@ -5,6 +5,7 @@
 1. 針對 1.x 的測試使用 docker compose
    1. `1.x` 使用 `$docker compose up`，等到 MySQL 啟動後並出現 ready for connections 代表完成
    2. 對應的測試 script 用 node.js 撰寫，執行 `$node test/index.js`
+   3. 如果要重跑實驗最好清掉 container `$docker container prune`
 
 ## 說明
 ### MySQL Replication
@@ -37,7 +38,7 @@ statement-based 會 `db1, db2 都更新`而 row-based 只有 db1 更新
 可以看出 row-based 的 binlog 格式相對安全許多，也比較符合預期
 
 #### 1.2.1 實驗
-測試寫入同步的 Table，這會導致 replication 中斷，並在 log 看到錯誤
+測試INSERT 新資料到同步的 Table 會導致 replication 中斷，並在 log 看到錯誤
 > [ERROR] Error running query, slave SQL thread aborted. Fix the problem, and restart the slave SQL thread with "SLAVE START". We stopped at log 'mysql-bin.000003' position 1310.
 
 #### 1.2.2 實驗
@@ -45,5 +46,23 @@ statement-based 會 `db1, db2 都更新`而 row-based 只有 db1 更新
 
 #### 1.2.3 實驗
 如果是 statement-based 的同步方式，更新 Table schema 是否影響
-1. 新增欄位 => statement-based / row-based 都可以
-2. 調整既有欄位 => row-based 不行，但是 statement 可以
+1. 新增欄位，並修改已同步的資料 => statement-based / row-based 都可以
+2. 調整既有欄位，我把 varchar(255) 改成 varchar(200) => row-based 不行，但是 statement 可以
+3. 增加 Index => 都可以
+
+#### 1.3 實驗
+指定多個 source 同步到一個 replica 上，需要調整 replica 設定
+```
+mysql> STOP SLAVE;
+mysql> SET GLOBAL master_info_repository = 'TABLE';
+mysql> SET GLOBAL relay_log_info_repository = 'TABLE';
+```
+在 replica 中，需要指定不同的 channel
+```
+mysql> CHANGE MASTER TO MASTER_HOST="source2" .... FOR CHANNEL "source_2";
+mysql> START SLAVE FOR CHANNEL "source_2";
+```
+如果故意把 source1 / source2 的 database / table 都取一樣產生衝突，會導致複製失敗
+```
+Error running query, slave SQL thread aborted. Fix the problem, and restart the slave SQL thread with "SLAVE START". We stopped at log 'mysql-bin.000003' position 1046
+```
