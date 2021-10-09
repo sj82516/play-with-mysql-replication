@@ -3,17 +3,16 @@ const {
     connectDB,
     setUpReplication,
     closeConnection
-} = require('../../common');
+} = require('../common');
 
 async function main() {
-    const sourceDBConnection = await connectDB('localhost');
-    const replicaDBConnection = await connectDB('localhost');
-    await setUpReplication(sourceDBConnection, replicaDBConnection);
+    const sourceDBConnection = await connectDB('statement.cwvdhhllbd8v.us-east-1.rds.amazonaws.com', port = 3306);
+    const replicaDBConnection = await connectDB('statement-replica.cwvdhhllbd8v.us-east-1.rds.amazonaws.com', port = 3306);
     await createDBAndInsertData(sourceDBConnection);
     // 需要等一小段時間同步
     await new Promise(resolve => setTimeout(resolve, 5000)); 
     // 有三種情境可以改
-    await changeReplicaTableSchema(replicaDBConnection, type = 'add-index');
+    await changeReplicaTableSchema(replicaDBConnection, type = 'change-existed-column');
     await writeToSource(sourceDBConnection);
     await checkDataInReplica(replicaDBConnection);
     await closeConnection(sourceDBConnection, replicaDBConnection);

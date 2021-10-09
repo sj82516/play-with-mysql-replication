@@ -1,7 +1,6 @@
 const mysql = require('mysql2/promise');
 const {
-    connectSourceDB,
-    connectReplicaDB,
+    connectDB,
     setUpReplication,
     closeConnection
 } = require('../../common');
@@ -14,8 +13,8 @@ async function main() {
 main();
 
 async function loop(sourcePort, name, source) {
-    const sourceDBConnection = await connectSourceDB('localhost', sourcePort);
-    const replicaDBConnection = await connectReplicaDB('localhost');
+    const sourceDBConnection = await connectDB('localhost', sourcePort);
+    const replicaDBConnection = await connectDB('localhost');
     await setUpReplication(sourceDBConnection, replicaDBConnection, source, source);
     await createDBAndInsertData(sourceDBConnection, name);
     await new Promise(resolve => setTimeout(resolve, 5000)); 

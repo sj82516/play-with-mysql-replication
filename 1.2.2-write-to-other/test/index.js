@@ -1,15 +1,14 @@
 const mysql = require('mysql2/promise');
 
 const {
-    connectSourceDB,
-    connectReplicaDB,
+    connectDB,
     setUpReplication,
     closeConnection
 } = require('../../common');
 
 async function main() {
-    const sourceDBConnection = await connectSourceDB('localhost');
-    const replicaDBConnection = await connectReplicaDB('localhost');
+    const sourceDBConnection = await connectDB('localhost');
+    const replicaDBConnection = await connectDB('localhost');
     await setUpReplication(sourceDBConnection, replicaDBConnection);
     await createDBAndInsertData(sourceDBConnection);
     // 需要等一小段時間同步

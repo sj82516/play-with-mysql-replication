@@ -1,20 +1,11 @@
 const mysql = require('mysql2/promise');
 
-exports.connectSourceDB = async function connectSourceDB(url, port = 3307) {
+exports.connectDB = async function connectDB(url, port = 3307) {
     return await mysql.createConnection({
         host: url,
         user: 'root',
         password: 'rootroot',
         port: port
-    })
-}
-
-exports.connectReplicaDB = async function connectReplicaDB(url) {
-    return await mysql.createConnection({
-        host: url,
-        user: 'root',
-        password: 'rootroot',
-        port: 3308
     })
 }
 
